@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    {% load static %}
+    {% load i18n %}
+    <link rel="shortcut icon" href="{% static '/img/logo_min.png' %}" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSK Shop</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/adaptive.css' %}">
+    <link rel="stylesheet" href="{% static 'css/animate.css' %}">
+</head>
+<body>
+{% include "base_menu.html" %}
+
+<h2 class="text-center mt-4">{% trans "Оформлення замовлення" %}</h2>
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <form class="col-md-8 order-form pe-4" method="POST">
+            {% csrf_token %}
+            <!-- Навигация по шагам с использованием Bootstrap nav-tabs -->
+            <ul class="nav nav-tabs" id="orderTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="delivery-tab" data-bs-toggle="tab" 
+                        data-bs-target="#delivery" type="button" role="tab" aria-controls="delivery" aria-selected="true">
+                {% trans "Доставка" %}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="payment-tab" data-bs-toggle="tab" 
+                        data-bs-target="#payment" type="button" role="tab" aria-controls="payment" aria-selected="false">
+                {% trans "Оплата" %}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="confirmation-tab" data-bs-toggle="tab" 
+                        data-bs-target="#confirmation" type="button" role="tab" aria-controls="confirmation" aria-selected="false">
+                {% trans "Підтвердження" %}
+                </button>
+            </li>
+            </ul>
+            
+            <!-- Содержимое шагов -->
+            <div class="tab-content pt-3">
+            <!-- Шаг 1: Доставка -->
+            <div class="tab-pane fade show active" id="delivery" role="tabpanel" aria-labelledby="delivery-tab">
+                <div id="deliveryForm">
+                    <div class="mb-3">
+                        <label for="phone_number" class="form-label">{{ form.phone_number.label_tag }}</label>
+                        {{ form.phone_number }}
+                        {% for error in form.phone_number.errors %}
+                            <div class="alert alert-danger" style="{% if forloop.counter == 1 %}margin-top: 1rem;{% endif %}">
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="firstName" class="form-label">{{ form.first_name.label_tag }}</label>
+                        {{ form.first_name }}
+                        {% for error in form.first_name.errors %}
+                            <div class="alert alert-danger" style="{% if forloop.counter == 1 %}margin-top: 1rem;{% endif %}">
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="lastName" class="form-label">{{ form.last_name.label_tag }}</label>
+                        {{ form.last_name }}
+                        {% for error in form.last_name.errors %}
+                            <div class="alert alert-danger" style="{% if forloop.counter == 1 %}margin-top: 1rem;{% endif %}">
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="patronymic" class="form-label">{{ form.patronymic.label_tag }}</label>
+                        {{ form.patronymic }}
+                        {% for error in form.patronymic.errors %}
+                            <div class="alert alert-danger" style="{% if forloop.counter == 1 %}margin-top: 1rem;{% endif %}">
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label for="order_adress" class="form-label">{{ form.order_adress.label_tag }}</label>
+                        {{ form.order_adress }}
+                        {% for error in form.order_adress.errors %}
+                            <div class="alert alert-danger" style="{% if forloop.counter == 1 %}margin-top: 1rem;{% endif %}">
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="mb-4">
+                        <label for="deliveryMethod" class="form-label">{{ form.delivery_method.label_tag }}</label>
+                        {{ form.delivery_method }}
+                        {% for error in form.delivery_method.errors %}
+                            <div class="alert alert-danger" style="{% if forloop.counter == 1 %}margin-top: 1rem;{% endif %}">
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" class="btn btn-primary" data-next-tab="payment">
+                        {% trans "Продовжити" %}
+                    </button>                
+                </div>
+            </div>
+            
+            <!-- Шаг 2: Оплата -->
+            <div class="tab-pane fade" id="payment" role="tabpanel" aria-labelledby="payment-tab">
+                <div id="paymentForm">
+                    <!-- Блок выбора способа оплаты карточками -->
+                    <div>
+                        <label class="form-label">{{ form.payment_method.label_tag }}</label>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="card payment-card rounded-3" data-value="Cash on delivery" style="cursor:pointer; overflow: hidden;">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">{% trans "Готівкою при отриманні" %}</h5>
+                                        <p class="card-text">
+                                            <i class="bi bi-cash-stack" style="font-size: 2rem;"></i>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="card payment-card rounded-3" data-value="On card" style="cursor:pointer; overflow: hidden;">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">{% trans "Карткою онлайн" %}</h5>
+                                        <p class="card-text">
+                                            <i class="bi bi-credit-card" style="font-size: 2rem;"></i>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Вариант с криптовалютой отключен -->
+                            <div class="col-md-4 mb-3"> 
+                                <!-- data-value="Crypto" -->
+                                <div class="card payment-card rounded-3" style="cursor:pointer; overflow: hidden; opacity: 0.5; pointer-events: none;" title='{% trans "Скоро" %}'>
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title">{% trans "Криптовалюта" %}</h5>
+                                        <p class="card-text">
+                                            <i class="bi bi-currency-bitcoin" style="font-size: 2rem;"></i>
+                                        </p>
+                                    </div>
+                                    <!-- Плашка "Скоро", расположенная в правом верхнем углу -->
+                                    <span class="badge bg-primary position-absolute top-0 end-0 m-2" style="z-index: 10;">{% trans "Скоро" %}</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% for error in form.payment_method.errors %}
+                            <div class="alert alert-danger">
+                                {{ error|escape }}
+                            </div>
+                        {% endfor %}
+                        {{ form.payment_method }}
+                    </div>
+            
+                    <!-- Блок передоплати, изначально скрыт -->
+                    <div class="mb-3">
+                        <label for="prepayment" class="form-label">{% trans "Сума до сплати зараз" %}</label>
+                        <input type="number" class="form-control" placeholder="{% trans '200 грн.' %}" id="prepayment" data-price-courier="{{ cart.total }} + {% trans '400 грн' %}" data-price-courier-low="{% trans '400 грн' %}" data-price="{{ cart.total }} + {% trans '200 грн.' %}" data-price-low="{% trans '200 грн.' %}" readonly>
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-outline-secondary" data-next-tab="delivery">
+                            {% trans "Назад" %}
+                        </button> 
+                        <button type="button" class="btn btn-primary" data-next-tab="confirmation">
+                            {% trans "Продовжити" %}
+                        </button> 
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Шаг 3: Подтверждение -->
+            <div class="tab-pane fade" id="confirmation" role="tabpanel" aria-labelledby="confirmation-tab">
+                {% if form.non_field_errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+                <h4 class="mb-3">{% trans "Перевірте замовлення" %}</h4>
+                <p>{% trans "Номер телефону" %}: <span id="confirmPhone_number"></span></p>
+                <p>{% trans "Адреса" %}: <span id="confirmAddress"></span></p>
+                <p>{% trans "Доставка" %}: <span id="confirmDelivery"></span></p>
+                <p>{% trans "Отримувач" %}: <span id="confirmFullName"></span></p>
+                <p>{% trans "Спосіб оплати" %}: <span id="confirmPayment"></span></p>
+                <p>{% trans "Сума до сплати онлайн" %}: <span id="confirmPrepayment">{{ cart.total }} {% trans "грн" %}</span></p>
+                <div class="d-flex justify-content-between mt-4">
+                <button type="button" class="btn btn-outline-secondary" data-next-tab="payment">
+                    {% trans "Назад" %}
+                </button> 
+                <button type="submit" class="btn btn-primary">
+                    {% trans "Перейти до оплати" %}
+                </button>
+                </div>
+            </div>
+            </div>
+        </form>
+        <!-- Правая часть: блок товаров -->
+        <div class="order-summary col-md-4">
+            <div class="card p-3 mt-3">
+                <span class="mb-2"><strong>Товари</strong> <spam class="text-secondary">{{ cart.items.count }}</span></span>
+                <div class="row row-cols-2 row-cols-md-1 row-cols-lg-2 mt-2">
+                    {% for item in cart.items.all %}
+                    <div class="col d-flex align-items-center mb-3" style="padding-bottom: 0px;">
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" height="48" class="me-2 ms-2 rounded-1" width="48">
+                        <div class="d-flex" style="flex-direction: column;">
+                            <p class="mb-0" style="font-size: 14px;">{{ item.price }} {% trans "грн" %}</p>
+                            <p class="text-secondary small mb-0">x {{ item.quantity }} {% trans "шт." %}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                <hr class="mt-0">
+                <p class="d-flex justify-content-between">{{ count_cart_items }} {% trans "товари на суму:" %}     
+                <span>
+                    {% if cart.total_without_sale != cart.total %}
+                        <del class="text-muted me-2">{{ cart.total_without_sale }} {% trans "грн" %}</del>
+                    {% endif %}
+                    <strong>{{ cart.total }} {% trans "грн" %}</strong>
+                </span>
+                <p class="d-flex justify-content-between">{% trans "Доставка:" %} <span class="text-primary"><strong id="delivery_cost">{% trans '200 грн.' %}</strong></span></p>
+                <div class="d-flex justify-content-between"><span>{% trans "Загальна сума:" %}</span> <h6 id="totalPriceOrder" data-cart-total="{{ cart.total }}" class="ms-3"> + {% trans '200 грн.' %}</h6></div>
+                <button type="button" class="btn btn-primary mt-2" data-next-tab="confirmation">
+                    {% trans "Підтвердити замовлення" %}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>    
+
+<footer class="bg-light text-dark py-4 mt-4 border-top">
+    <div class="container text-center">
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <a href="{% url 'about_us' %}" class="text-decoration-none text-dark me-3">{% trans "Про нас та гарантії" %}</a>
+            </div>
+            <div class="col-md-6">
+                <p class="mb-0">&copy; {% trans "2024 Інтернет-магазин. Всі права захищені." %}</p>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script type="module" src="{% static 'js/scripts.js' %}"></script>
+</body>
+</html>
