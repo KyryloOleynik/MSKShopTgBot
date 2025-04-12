@@ -41,7 +41,7 @@ logger = structlog.get_logger()
 async def connect_to_website_db():
     pool = await aiomysql.create_pool(
         host='localhost',
-        user='msk52.shop',
+        user='sitedata',
         password='871455Ork',
         db='sitedata',
         autocommit=True
